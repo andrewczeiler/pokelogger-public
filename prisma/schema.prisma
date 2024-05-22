@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model location {
+  id            Int    @id @default(autoincrement())
+  game          String
+  pokemon_name  String
+  location      String
+  created_at    DateTime    @db.Timestamp(0)
+  updated_at    DateTime    @db.Timestamp(0)
+}
+
+model pokemon {
+  id                Int         @id @default(autoincrement())
+  pokedex_id        Int
+  pokedex           pokedex     @relation(fields: [pokedex_id], references: [id])
+  number            Int
+  name              String
+  form              String
+  caught            Boolean     @default(false)
+  created_at        DateTime    @db.Timestamp(0)
+  updated_at        DateTime    @db.Timestamp(0)
+}
+
+model pokedex {
+  id                Int         @id @default(autoincrement())
+  user_id           String
+  user              user        @relation(fields: [user_id], references: [id])
+  game              String
+  shiny             Boolean
+  dlc               Boolean     @default(false)
+  name              String
+  pokemon           pokemon[]     
+  created_at        DateTime    @db.Timestamp(0)
+  updated_at        DateTime    @db.Timestamp(0)
+
+  @@unique([user_id, name])
+}
+
+model user {
+  id                String      @id @default(cuid())
+  username          String      @unique
+  email             String      @unique
+  password          String
+  pokedexes         pokedex[]
+  created_at        DateTime    @db.Timestamp(0)
+  updated_at        DateTime    @db.Timestamp(0)
+}
